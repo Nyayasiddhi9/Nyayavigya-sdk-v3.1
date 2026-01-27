@@ -1,0 +1,105 @@
+{
+  "version": "1.0.0",
+  "id": "dubbing-v1",
+  "name": "Multi-Language Dubbing Pipeline",
+  "description": "Automated dubbing with voice cloning and lip-sync",
+  "type": "production",
+  "romaCompliant": true,
+  "agents": [
+    "ai-specialist-1",
+    "video-producer-2",
+    "mobile-qa-1"
+  ],
+  "workflow": {
+    "steps": [
+      {
+        "id": "dubbing-v1-audio-extraction",
+        "name": "Audio Extraction",
+        "order": 1,
+        "agent": "ai-specialist-1",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      },
+      {
+        "id": "dubbing-v1-translation",
+        "name": "Translation",
+        "order": 2,
+        "agent": "video-producer-2",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      },
+      {
+        "id": "dubbing-v1-voice-synthesis",
+        "name": "Voice Synthesis",
+        "order": 3,
+        "agent": "mobile-qa-1",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      },
+      {
+        "id": "dubbing-v1-lip-sync",
+        "name": "Lip Sync",
+        "order": 4,
+        "agent": "ai-specialist-1",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      },
+      {
+        "id": "dubbing-v1-quality-check",
+        "name": "Quality Check",
+        "order": 5,
+        "agent": "video-producer-2",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      }
+    ],
+    "routing": {
+      "sequential": true,
+      "parallelCapable": false,
+      "fallbackStrategy": "graceful-degradation"
+    }
+  },
+  "evaluation": {
+    "metrics": [
+      "quality_score",
+      "execution_time",
+      "resource_usage",
+      "user_satisfaction"
+    ],
+    "thresholds": {
+      "quality_score": 0.8,
+      "execution_time": 600000,
+      "resource_usage": "medium",
+      "user_satisfaction": 0.85
+    },
+    "goldens": [
+      "dubbing-v1-golden-test-1",
+      "dubbing-v1-golden-test-2"
+    ]
+  },
+  "deployment": {
+    "status": "active",
+    "regions": [
+      "us-east-1",
+      "eu-west-1",
+      "ap-southeast-1"
+    ],
+    "scaling": "auto",
+    "monitoring": true
+  }
+}

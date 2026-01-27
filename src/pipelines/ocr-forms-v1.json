@@ -1,0 +1,105 @@
+{
+  "version": "1.0.0",
+  "id": "ocr-forms-v1",
+  "name": "OCR Forms Processing",
+  "description": "Intelligent form processing with OCR and validation",
+  "type": "production",
+  "romaCompliant": true,
+  "agents": [
+    "ai-specialist-1",
+    "data-specialist-1",
+    "api-qa-1"
+  ],
+  "workflow": {
+    "steps": [
+      {
+        "id": "ocr-forms-v1-image-preprocessing",
+        "name": "Image Preprocessing",
+        "order": 1,
+        "agent": "ai-specialist-1",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      },
+      {
+        "id": "ocr-forms-v1-ocr-extraction",
+        "name": "Ocr Extraction",
+        "order": 2,
+        "agent": "data-specialist-1",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      },
+      {
+        "id": "ocr-forms-v1-field-validation",
+        "name": "Field Validation",
+        "order": 3,
+        "agent": "api-qa-1",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      },
+      {
+        "id": "ocr-forms-v1-data-structuring",
+        "name": "Data Structuring",
+        "order": 4,
+        "agent": "ai-specialist-1",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      },
+      {
+        "id": "ocr-forms-v1-export",
+        "name": "Export",
+        "order": 5,
+        "agent": "data-specialist-1",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      }
+    ],
+    "routing": {
+      "sequential": true,
+      "parallelCapable": false,
+      "fallbackStrategy": "graceful-degradation"
+    }
+  },
+  "evaluation": {
+    "metrics": [
+      "quality_score",
+      "execution_time",
+      "resource_usage",
+      "user_satisfaction"
+    ],
+    "thresholds": {
+      "quality_score": 0.8,
+      "execution_time": 600000,
+      "resource_usage": "medium",
+      "user_satisfaction": 0.85
+    },
+    "goldens": [
+      "ocr-forms-v1-golden-test-1",
+      "ocr-forms-v1-golden-test-2"
+    ]
+  },
+  "deployment": {
+    "status": "active",
+    "regions": [
+      "us-east-1",
+      "eu-west-1",
+      "ap-southeast-1"
+    ],
+    "scaling": "auto",
+    "monitoring": true
+  }
+}

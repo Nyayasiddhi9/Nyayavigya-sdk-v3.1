@@ -1,0 +1,280 @@
+{
+  "version": "11.0.0",
+  "lastUpdated": "2026-01-27T00:00:00.000Z",
+  "defaultProvider": "ANTHROPIC",
+  "legalOptimized": true,
+  "fallbackChain": [
+    "claude-sonnet-4.5",
+    "gpt-5.1",
+    "gemini-3.0-flash",
+    "sarvam-legal-2.0",
+    "deepseek-r1"
+  ],
+  "providers": {
+    "OPENAI": {
+      "enabled": true,
+      "apiKeyEnv": "OPENAI_API_KEY",
+      "baseUrl": "https://api.openai.com/v1",
+      "models": [
+        "gpt-5.2",
+        "gpt-5.1",
+        "gpt-5.0",
+        "o3-pro",
+        "o3",
+        "o3-mini",
+        "gpt-4o",
+        "gpt-4o-mini"
+      ],
+      "defaultModel": "gpt-5.1",
+      "rateLimits": {
+        "rpm": 5000,
+        "tpm": 300000
+      },
+      "legalUseCases": {
+        "gpt-5.1": ["legal-research", "case-analysis", "contract-drafting"],
+        "o3-pro": ["complex-legal-reasoning", "statutory-interpretation"],
+        "gpt-4o": ["general-legal-queries", "document-review"]
+      }
+    },
+    "ANTHROPIC": {
+      "enabled": true,
+      "apiKeyEnv": "ANTHROPIC_API_KEY",
+      "baseUrl": "https://api.anthropic.com",
+      "models": [
+        "claude-opus-4.5",
+        "claude-sonnet-4.5",
+        "claude-haiku-4.5",
+        "claude-4-opus",
+        "claude-4-sonnet"
+      ],
+      "defaultModel": "claude-sonnet-4.5",
+      "rateLimits": {
+        "rpm": 5000,
+        "tpm": 400000
+      },
+      "legalUseCases": {
+        "claude-opus-4.5": ["complex-legal-analysis", "judgment-drafting", "appellate-briefs"],
+        "claude-sonnet-4.5": ["pleading-drafting", "legal-research", "case-summaries"],
+        "claude-haiku-4.5": ["quick-legal-queries", "citation-lookup", "form-filling"]
+      }
+    },
+    "GOOGLE": {
+      "enabled": true,
+      "apiKeyEnv": "GEMINI_API_KEY",
+      "baseUrl": "https://generativelanguage.googleapis.com/v1beta",
+      "models": [
+        "gemini-3.0-pro",
+        "gemini-3.0-flash",
+        "gemini-2.5-pro",
+        "gemini-2.5-flash"
+      ],
+      "defaultModel": "gemini-3.0-pro",
+      "rateLimits": {
+        "rpm": 4000,
+        "tpm": 200000
+      },
+      "legalUseCases": {
+        "gemini-3.0-pro": ["entire-case-file-analysis", "multi-document-review", "long-judgment-analysis"],
+        "gemini-3.0-flash": ["quick-statute-lookup", "case-citation-checking"]
+      }
+    },
+    "XAI": {
+      "enabled": true,
+      "apiKeyEnv": "XAI_API_KEY",
+      "baseUrl": "https://api.x.ai/v1",
+      "models": [
+        "grok-4",
+        "grok-3.5",
+        "grok-vision-4"
+      ],
+      "defaultModel": "grok-4",
+      "rateLimits": {
+        "rpm": 6000,
+        "tpm": 600000
+      },
+      "legalUseCases": {
+        "grok-4": ["current-legal-news", "recent-judgments", "regulatory-updates"]
+      }
+    },
+    "DEEPSEEK": {
+      "enabled": true,
+      "apiKeyEnv": "DEEPSEEK_API_KEY",
+      "baseUrl": "https://api.deepseek.com/v1",
+      "models": [
+        "deepseek-v4",
+        "deepseek-r1-0528",
+        "deepseek-r1",
+        "deepseek-coder-v3"
+      ],
+      "defaultModel": "deepseek-r1-0528",
+      "rateLimits": {
+        "rpm": 3000,
+        "tpm": 150000
+      },
+      "legalUseCases": {
+        "deepseek-r1-0528": ["complex-legal-reasoning", "tax-calculations", "statutory-analysis"],
+        "deepseek-r1": ["cost-effective-legal-research", "general-legal-queries"]
+      }
+    },
+    "GROQ": {
+      "enabled": true,
+      "apiKeyEnv": "GROQ_API_KEY",
+      "baseUrl": "https://api.groq.com/openai/v1",
+      "models": [
+        "llama-4-maverick-17b",
+        "llama-3.3-70b-versatile"
+      ],
+      "defaultModel": "llama-3.3-70b-versatile",
+      "rateLimits": {
+        "rpm": 30,
+        "tpm": 14400
+      },
+      "legalUseCases": {
+        "llama-3.3-70b-versatile": ["fast-legal-queries", "batch-processing", "testing"]
+      }
+    },
+    "PERPLEXITY": {
+      "enabled": true,
+      "apiKeyEnv": "PERPLEXITY_API_KEY",
+      "baseUrl": "https://api.perplexity.ai",
+      "models": [
+        "sonar-pro-2",
+        "sonar-reasoning-pro",
+        "sonar-deep-research"
+      ],
+      "defaultModel": "sonar-pro-2",
+      "rateLimits": {
+        "rpm": 50,
+        "tpm": 20000
+      },
+      "legalUseCases": {
+        "sonar-pro-2": ["legal-research", "case-law-discovery", "statutory-updates"],
+        "sonar-deep-research": ["comprehensive-legal-research", "comparative-law-analysis"]
+      }
+    },
+    "COHERE": {
+      "enabled": true,
+      "apiKeyEnv": "COHERE_API_KEY",
+      "baseUrl": "https://api.cohere.ai/v1",
+      "models": [
+        "command-r-plus-2.0",
+        "command-a"
+      ],
+      "defaultModel": "command-r-plus-2.0",
+      "rateLimits": {
+        "rpm": 100,
+        "tpm": 50000
+      },
+      "legalUseCases": {
+        "command-r-plus-2.0": ["legal-rag", "case-law-retrieval", "grounded-legal-responses"]
+      }
+    },
+    "AI21": {
+      "enabled": true,
+      "apiKeyEnv": "AI21_API_KEY",
+      "baseUrl": "https://api.ai21.com/studio/v1",
+      "models": [
+        "jamba-2.5-large"
+      ],
+      "defaultModel": "jamba-2.5-large",
+      "rateLimits": {
+        "rpm": 60,
+        "tpm": 40000
+      },
+      "legalUseCases": {
+        "jamba-2.5-large": ["long-judgment-processing", "case-file-analysis"]
+      }
+    },
+    "SARVAM": {
+      "enabled": true,
+      "apiKeyEnv": "SARVAM_API_KEY",
+      "baseUrl": "https://api.sarvam.ai/v1",
+      "models": [
+        "sarvam-3.0",
+        "sarvam-legal-2.0",
+        "sarvam-voice-2.0"
+      ],
+      "defaultModel": "sarvam-legal-2.0",
+      "rateLimits": {
+        "rpm": 100,
+        "tpm": 50000
+      },
+      "legalUseCases": {
+        "sarvam-legal-2.0": ["indian-legal-documents", "hindi-legal-drafting", "regional-court-filings"],
+        "sarvam-3.0": ["multilingual-client-communication", "translation"],
+        "sarvam-voice-2.0": ["voice-dictation", "court-transcription"]
+      },
+      "indianLanguages": [
+        "hi", "ta", "te", "bn", "mr", "gu", "kn", "ml", "pa", "or", "as", "ur",
+        "sd", "ks", "ne", "sa", "kok", "doi", "mni", "sat", "bo", "mai"
+      ]
+    },
+    "MISTRAL": {
+      "enabled": true,
+      "apiKeyEnv": "MISTRAL_API_KEY",
+      "baseUrl": "https://api.mistral.ai/v1",
+      "models": [
+        "mistral-large-2.5",
+        "codestral-2.5"
+      ],
+      "defaultModel": "mistral-large-2.5",
+      "rateLimits": {
+        "rpm": 100,
+        "tpm": 50000
+      },
+      "legalUseCases": {
+        "mistral-large-2.5": ["multilingual-legal-documents", "european-law-analysis"]
+      }
+    },
+    "MOONSHOT": {
+      "enabled": true,
+      "apiKeyEnv": "MOONSHOT_API_KEY",
+      "baseUrl": "https://api.moonshot.cn/v1",
+      "models": [
+        "kimi-3.0-200k"
+      ],
+      "defaultModel": "kimi-3.0-200k",
+      "rateLimits": {
+        "rpm": 60,
+        "tpm": 100000
+      },
+      "legalUseCases": {
+        "kimi-3.0-200k": ["long-judgment-analysis", "case-bundle-review"]
+      }
+    },
+    "ELEVENLABS": {
+      "enabled": true,
+      "apiKeyEnv": "ELEVENLABS_API_KEY",
+      "baseUrl": "https://api.elevenlabs.io/v1",
+      "models": [
+        "eleven_turbo_v3",
+        "eleven_multilingual_v3"
+      ],
+      "defaultModel": "eleven_turbo_v3",
+      "legalUseCases": {
+        "eleven_turbo_v3": ["legal-document-narration", "accessibility"],
+        "eleven_multilingual_v3": ["indian-language-voice", "client-communication"]
+      }
+    }
+  },
+  "routing": {
+    "strategy": "legal-quality-optimized",
+    "costOptimization": true,
+    "qualityThreshold": 0.90,
+    "latencyThreshold": 5000,
+    "fallbackEnabled": true,
+    "autoModelSelection": true
+  },
+  "legalTaskRouting": {
+    "legal-research": ["claude-sonnet-4.5", "sonar-pro-2", "gpt-5.1"],
+    "pleading-drafting": ["claude-opus-4.5", "claude-sonnet-4.5", "gpt-5.1"],
+    "contract-analysis": ["gpt-5.1", "claude-sonnet-4.5", "gemini-3.0-pro"],
+    "case-analysis": ["gemini-3.0-pro", "claude-sonnet-4.5", "gpt-5.1"],
+    "statutory-interpretation": ["o3-pro", "deepseek-r1-0528", "claude-opus-4.5"],
+    "hindi-legal": ["sarvam-legal-2.0", "sarvam-3.0"],
+    "regional-language": ["sarvam-3.0", "sarvam-legal-2.0"],
+    "quick-lookup": ["claude-haiku-4.5", "gemini-3.0-flash", "grok-3.5"],
+    "long-document": ["gemini-3.0-pro", "jamba-2.5-large", "kimi-3.0-200k"],
+    "cost-effective": ["deepseek-r1", "gemini-2.5-flash", "llama-3.3-70b-versatile"]
+  }
+}

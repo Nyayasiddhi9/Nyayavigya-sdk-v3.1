@@ -1,0 +1,105 @@
+{
+  "version": "1.0.0",
+  "id": "assistant-hub-v1",
+  "name": "AI Assistant Creation Hub",
+  "description": "Complete AI assistant creation and deployment",
+  "type": "production",
+  "romaCompliant": true,
+  "agents": [
+    "ai-ml-developer-2",
+    "react-specialist-1",
+    "devops-engineer-2"
+  ],
+  "workflow": {
+    "steps": [
+      {
+        "id": "assistant-hub-v1-assistant-design",
+        "name": "Assistant Design",
+        "order": 1,
+        "agent": "ai-ml-developer-2",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      },
+      {
+        "id": "assistant-hub-v1-model-integration",
+        "name": "Model Integration",
+        "order": 2,
+        "agent": "react-specialist-1",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      },
+      {
+        "id": "assistant-hub-v1-ui-creation",
+        "name": "Ui Creation",
+        "order": 3,
+        "agent": "devops-engineer-2",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      },
+      {
+        "id": "assistant-hub-v1-testing",
+        "name": "Testing",
+        "order": 4,
+        "agent": "ai-ml-developer-2",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      },
+      {
+        "id": "assistant-hub-v1-deployment",
+        "name": "Deployment",
+        "order": 5,
+        "agent": "react-specialist-1",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      }
+    ],
+    "routing": {
+      "sequential": true,
+      "parallelCapable": false,
+      "fallbackStrategy": "graceful-degradation"
+    }
+  },
+  "evaluation": {
+    "metrics": [
+      "quality_score",
+      "execution_time",
+      "resource_usage",
+      "user_satisfaction"
+    ],
+    "thresholds": {
+      "quality_score": 0.8,
+      "execution_time": 600000,
+      "resource_usage": "medium",
+      "user_satisfaction": 0.85
+    },
+    "goldens": [
+      "assistant-hub-v1-golden-test-1",
+      "assistant-hub-v1-golden-test-2"
+    ]
+  },
+  "deployment": {
+    "status": "active",
+    "regions": [
+      "us-east-1",
+      "eu-west-1",
+      "ap-southeast-1"
+    ],
+    "scaling": "auto",
+    "monitoring": true
+  }
+}

@@ -1,0 +1,140 @@
+# WAI SDK v2.0 - Google Cloud Deployment Manager Template
+# Single-click deployment for GCP
+
+resources:
+# Cloud Run Service
+- name: wai-sdk-service
+  type: gcp-types/run-v1:namespaces.services
+  properties:
+    apiVersion: serving.knative.dev/v1
+    kind: Service
+    metadata:
+      name: wai-sdk
+      namespace: ${PROJECT_ID}
+      annotations:
+        run.googleapis.com/ingress: all
+    spec:
+      template:
+        metadata:
+          annotations:
+            autoscaling.knative.dev/maxScale: '10'
+            autoscaling.knative.dev/minScale: '1'
+            run.googleapis.com/cpu-throttling: 'false'
+        spec:
+          containerConcurrency: 80
+          timeoutSeconds: 300
+          containers:
+          - image: gcr.io/${PROJECT_ID}/wai-sdk:v2.0
+            ports:
+            - containerPort: 5000
+            resources:
+              limits:
+                cpu: '2'
+                memory: 2Gi
+            env:
+            - name: NODE_ENV
+              value: production
+            - name: PORT
+              value: '5000'
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: wai-sdk-database-url
+                  key: latest
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: wai-sdk-redis-url
+                  key: latest
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: wai-sdk-openai-key
+                  key: latest
+      traffic:
+      - percent: 100
+        latestRevision: true
+
+# Cloud SQL PostgreSQL Instance
+- name: wai-sdk-db
+  type: sqladmin.v1beta4.instance
+  properties:
+    region: us-central1
+    databaseVersion: POSTGRES_16
+    settings:
+      tier: db-f1-micro
+      activationPolicy: ALWAYS
+      ipConfiguration:
+        ipv4Enabled: true
+        authorizedNetworks: []
+        privateNetwork: $(ref.wai-sdk-network.selfLink)
+      backupConfiguration:
+        enabled: true
+        startTime: '03:00'
+      locationPreference:
+        zone: us-central1-a
+
+# Cloud SQL Database
+- name: wai-sdk-database
+  type: sqladmin.v1beta4.database
+  properties:
+    instance: $(ref.wai-sdk-db.name)
+    name: waisdk
+    charset: UTF8
+
+# Cloud Memorystore Redis
+- name: wai-sdk-redis
+  type: redis.v1.instance
+  properties:
+    region: us-central1
+    tier: BASIC
+    memorySizeGb: 1
+    redisVersion: REDIS_7_0
+    authorizedNetwork: $(ref.wai-sdk-network.selfLink)
+    displayName: wai-sdk-redis
+
+# VPC Network
+- name: wai-sdk-network
+  type: compute.v1.network
+  properties:
+    autoCreateSubnetworks: false
+    routingConfig:
+      routingMode: REGIONAL
+
+# Subnet
+- name: wai-sdk-subnet
+  type: compute.v1.subnetwork
+  properties:
+    region: us-central1
+    network: $(ref.wai-sdk-network.selfLink)
+    ipCidrRange: 10.0.0.0/24
+    privateIpGoogleAccess: true
+
+# Cloud Armor Security Policy
+- name: wai-sdk-security-policy
+  type: compute.v1.securityPolicy
+  properties:
+    description: Security policy for WAI SDK
+    rules:
+    - priority: 1000
+      action: allow
+      match:
+        versionedExpr: SRC_IPS_V1
+        config:
+          srcIpRanges:
+          - '*'
+    - priority: 2147483647
+      action: deny(403)
+      match:
+        versionedExpr: SRC_IPS_V1
+        config:
+          srcIpRanges:
+          - '*'
+
+outputs:
+- name: serviceUrl
+  value: $(ref.wai-sdk-service.status.url)
+- name: databaseConnection
+  value: $(ref.wai-sdk-db.connectionName)
+- name: redisHost
+  value: $(ref.wai-sdk-redis.host)

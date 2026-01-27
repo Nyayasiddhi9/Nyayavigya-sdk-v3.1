@@ -1,0 +1,59 @@
+{
+  "name": "nyayavighya-sdk",
+  "version": "3.1.0",
+  "description": "NyayaVighya Legal SDK v3.1 - Specialized Legal AI Platform for Indian Law with 275+ legal agents, comprehensive statute coverage, and enterprise features",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsx watch src/index.ts",
+    "start": "node dist/index.js",
+    "test": "vitest",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write src/**/*.ts",
+    "db:push": "drizzle-kit push",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate"
+  },
+  "keywords": ["legal-ai", "indian-law", "legal-sdk", "nyayavighya", "ipc", "crpc", "bns", "constitution", "agents", "enterprise"],
+  "author": "NyayaVighya Team",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@google/genai": "^1.0.1",
+    "@neondatabase/serverless": "^0.10.4",
+    "archiver": "^7.0.1",
+    "bcrypt": "^5.1.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "drizzle-orm": "^0.39.1",
+    "drizzle-zod": "^0.5.1",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "openai": "^4.96.0",
+    "pg": "^8.13.1",
+    "uuid": "^11.0.5",
+    "ws": "^8.18.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/archiver": "^6.0.3",
+    "@types/bcrypt": "^5.0.2",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/jsonwebtoken": "^9.0.7",
+    "@types/node": "^22.10.6",
+    "@types/pg": "^8.11.10",
+    "@types/uuid": "^10.0.0",
+    "@types/ws": "^8.5.13",
+    "drizzle-kit": "^0.30.4",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

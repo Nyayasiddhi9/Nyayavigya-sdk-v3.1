@@ -1,0 +1,33 @@
+{
+  "name": "@wai/protocols",
+  "version": "1.0.0",
+  "description": "WAI SDK Protocols - MCP, ROMA, BMAD, Parlant, A2A, AG-UI",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": ["dist", "src"],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui"
+  },
+  "dependencies": {
+    "@wai/core": "workspace:*",
+    "ws": "^8.16.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.1",
+    "typescript": "^5.7.2"
+  },
+  "license": "MIT"
+}

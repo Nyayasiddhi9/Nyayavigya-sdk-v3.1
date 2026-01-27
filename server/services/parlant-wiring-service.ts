@@ -1,0 +1,429 @@
+/**
+ * Parlant Standards Wiring Service
+ * 
+ * Wires Parlant prompt engineering standards into all Wizards platform workflows
+ * to ensure consistent, high-quality agent communications with anti-hallucination
+ * safeguards and behavioral compliance.
+ */
+
+import { ParlantGuidelineEngine, ParlantPromptRequest, ParlantGuideline } from '../integrations/parlant-standards';
+import { db } from '../db';
+import { wizardsOrchestrationJobs } from '@shared/schema';
+import { eq, desc } from 'drizzle-orm';
+
+interface ParlantApplicationResult {
+  requestId: string;
+  originalPrompt: string;
+  optimizedPrompt: string;
+  appliedGuidelines: string[];
+  executionTime: number;
+  qualityImprovement: number;
+}
+
+interface ParlantValidationResult {
+  passed: boolean;
+  violations: Array<{
+    guidelineId: string;
+    severity: 'low' | 'medium' | 'high' | 'critical';
+    message: string;
+  }>;
+  recommendations: string[];
+}
+
+export class ParlantWiringService {
+  private parlantEngine: ParlantGuidelineEngine;
+  private applicationHistory: Map<string, ParlantApplicationResult> = new Map();
+  private isEnabled: boolean = true;
+  private validationEnabled: boolean = true;
+  
+  constructor() {
+    this.parlantEngine = new ParlantGuidelineEngine();
+    this.setupEventListeners();
+    console.log('✅ Parlant Wiring Service initialized - standards enforcement enabled');
+  }
+  
+  /**
+   * Setup event listeners for Parlant engine
+   */
+  private setupEventListeners(): void {
+    this.parlantEngine.on('guideline-application-started', (data: any) => {
+      console.log(`📋 Parlant: Applying standards to request ${data.requestId} for agent ${data.agentId}`);
+    });
+    
+    this.parlantEngine.on('guideline-application-completed', (data: any) => {
+      console.log(`✅ Parlant: Applied ${data.appliedGuidelines} guidelines (${data.optimizedLength} chars)`);
+    });
+    
+    this.parlantEngine.on('guideline-added', (data: any) => {
+      console.log(`➕ Parlant: New guideline added - ${data.name} (${data.priority})`);
+    });
+    
+    this.parlantEngine.on('journey-created', (data: any) => {
+      console.log(`🚀 Parlant: Journey created - ${data.name} (${data.statesCount} states)`);
+    });
+    
+    this.parlantEngine.on('journey-transitioned', (data: any) => {
+      console.log(`🔄 Parlant: Journey ${data.journeyId}: ${data.previousState} → ${data.nextState} (${Math.round(data.completionRate * 100)}% complete)`);
+    });
+    
+    this.parlantEngine.on('error', (data: any) => {
+      console.error(`❌ Parlant error [${data.stage}]:`, data.error);
+    });
+  }
+  
+  /**
+   * Apply Parlant standards to a workflow prompt
+   * This is the main integration point used by orchestration service
+   */
+  async applyStandards(
+    agentId: string,
+    originalPrompt: string,
+    context: Record<string, any> = {},
+    workflowType?: string
+  ): Promise<string> {
+    if (!this.isEnabled) {
+      return originalPrompt;
+    }
+    
+    const startTime = Date.now();
+    const requestId = `parlant_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    try {
+      // Determine applicable guidelines based on workflow type
+      const guidelines = this.selectGuidelinesForWorkflow(workflowType);
+      
+      // Create Parlant request
+      const request: ParlantPromptRequest = {
+        id: requestId,
+        agentId,
+        originalPrompt,
+        context,
+        guidelines,
+        variables: {
+          workflow_type: workflowType || 'general',
+          agent_id: agentId,
+          timestamp: new Date().toISOString(),
+        },
+        metadata: {
+          timestamp: new Date(),
+          priority: this.determinePriority(workflowType),
+          expectedDuration: 5000, // 5 seconds expected
+        },
+      };
+      
+      // Apply Parlant guidelines
+      const optimizedPrompt = await this.parlantEngine.applyGuidelines(request);
+      
+      const executionTime = Date.now() - startTime;
+      
+      // Calculate quality improvement (length increase as proxy)
+      const qualityImprovement = (optimizedPrompt.length - originalPrompt.length) / originalPrompt.length;
+      
+      // Store application result
+      const result: ParlantApplicationResult = {
+        requestId,
+        originalPrompt,
+        optimizedPrompt,
+        appliedGuidelines: guidelines,
+        executionTime,
+        qualityImprovement,
+      };
+      
+      this.applicationHistory.set(requestId, result);
+      
+      // Keep only last 1000 results
+      if (this.applicationHistory.size > 1000) {
+        const oldestKey = this.applicationHistory.keys().next().value;
+        this.applicationHistory.delete(oldestKey);
+      }
+      
+      return optimizedPrompt;
+    } catch (error) {
+      console.error(`❌ Parlant standards application failed for ${agentId}:`, error);
+      // Fallback to original prompt if Parlant fails
+      return originalPrompt;
+    }
+  }
+  
+  /**
+   * Validate agent response against Parlant standards
+   */
+  async validateResponse(
+    agentId: string,
+    response: string,
+    originalPrompt: string,
+    context: Record<string, any> = {}
+  ): Promise<ParlantValidationResult> {
+    if (!this.validationEnabled) {
+      return { passed: true, violations: [], recommendations: [] };
+    }
+    
+    const violations: ParlantValidationResult['violations'] = [];
+    const recommendations: string[] = [];
+    
+    // Check for hallucination indicators
+    if (this.detectPotentialHallucination(response)) {
+      violations.push({
+        guidelineId: 'anti-hallucination',
+        severity: 'critical',
+        message: 'Response contains uncertain statements without proper qualification',
+      });
+      recommendations.push('Use canned responses for factual claims');
+    }
+    
+    // Check for security violations
+    if (this.detectSecurityIssues(response)) {
+      violations.push({
+        guidelineId: 'security-first',
+        severity: 'high',
+        message: 'Response may contain security anti-patterns',
+      });
+      recommendations.push('Review security implications of suggested code');
+    }
+    
+    // Check for code quality issues
+    if (originalPrompt.toLowerCase().includes('code') && this.detectCodeQualityIssues(response)) {
+      violations.push({
+        guidelineId: 'code-quality-check',
+        severity: 'medium',
+        message: 'Response lacks sufficient code quality guidance',
+      });
+      recommendations.push('Include error handling and testing recommendations');
+    }
+    
+    // Check for context consistency
+    if (context.previousInteractions && this.detectContextInconsistency(response, context)) {
+      violations.push({
+        guidelineId: 'context-preservation',
+        severity: 'medium',
+        message: 'Response may contradict previous interactions',
+      });
+      recommendations.push('Reference and build upon previous decisions');
+    }
+    
+    const passed = violations.filter(v => v.severity === 'critical' || v.severity === 'high').length === 0;
+    
+    return {
+      passed,
+      violations,
+      recommendations,
+    };
+  }
+  
+  /**
+   * Select applicable guidelines based on workflow type
+   */
+  private selectGuidelinesForWorkflow(workflowType?: string): string[] {
+    const baseGuidelines = ['anti-hallucination', 'context-preservation'];
+    
+    if (!workflowType) {
+      return baseGuidelines;
+    }
+    
+    const typeSpecificGuidelines: Record<string, string[]> = {
+      'idea-validation': [...baseGuidelines, 'code-quality-check'],
+      'architecture-design': [...baseGuidelines, 'security-first', 'performance-optimization'],
+      'code-generation': [...baseGuidelines, 'code-quality-check', 'security-first', 'performance-optimization'],
+      'testing': [...baseGuidelines, 'code-quality-check'],
+      'deployment': [...baseGuidelines, 'security-first', 'performance-optimization'],
+      'market-research': [...baseGuidelines],
+      'competitor-analysis': [...baseGuidelines],
+      'growth-strategy': [...baseGuidelines, 'performance-optimization'],
+    };
+    
+    return typeSpecificGuidelines[workflowType] || baseGuidelines;
+  }
+  
+  /**
+   * Determine priority based on workflow type
+   */
+  private determinePriority(workflowType?: string): string {
+    const highPriorityWorkflows = ['security-audit', 'deployment', 'architecture-design'];
+    const criticalWorkflows = ['production-deployment', 'security-critical'];
+    
+    if (criticalWorkflows.includes(workflowType || '')) {
+      return 'critical';
+    }
+    
+    if (highPriorityWorkflows.includes(workflowType || '')) {
+      return 'high';
+    }
+    
+    return 'medium';
+  }
+  
+  /**
+   * Detect potential hallucination in response
+   */
+  private detectPotentialHallucination(response: string): boolean {
+    const uncertainPhrases = [
+      'i think',
+      'probably',
+      'maybe',
+      'might be',
+      'could be',
+      'not sure',
+      'possibly',
+    ];
+    
+    const responseLower = response.toLowerCase();
+    const uncertainCount = uncertainPhrases.filter(phrase => responseLower.includes(phrase)).length;
+    
+    // Flag if response has 3+ uncertain phrases
+    return uncertainCount >= 3;
+  }
+  
+  /**
+   * Detect security issues in response
+   */
+  private detectSecurityIssues(response: string): boolean {
+    const securityAntiPatterns = [
+      'disable ssl',
+      'skip validation',
+      'bypass authentication',
+      'hardcode password',
+      'eval(',
+      'dangerouslySetInnerHTML',
+      'disable cors',
+    ];
+    
+    const responseLower = response.toLowerCase();
+    return securityAntiPatterns.some(pattern => responseLower.includes(pattern));
+  }
+  
+  /**
+   * Detect code quality issues in response
+   */
+  private detectCodeQualityIssues(response: string): boolean {
+    const qualityIndicators = [
+      'error handling',
+      'try-catch',
+      'validation',
+      'test',
+      'documentation',
+      'comment',
+    ];
+    
+    const responseLower = response.toLowerCase();
+    const qualityMentions = qualityIndicators.filter(indicator => responseLower.includes(indicator)).length;
+    
+    // Flag if response mentions fewer than 2 quality indicators
+    return qualityMentions < 2;
+  }
+  
+  /**
+   * Detect context inconsistency
+   */
+  private detectContextInconsistency(response: string, context: Record<string, any>): boolean {
+    // Simple heuristic: check if response references context
+    if (!context.previousInteractions) {
+      return false;
+    }
+    
+    const responseLower = response.toLowerCase();
+    const contextReferences = [
+      'previous',
+      'earlier',
+      'as we discussed',
+      'building on',
+      'continuing',
+    ];
+    
+    // Flag if no context references found
+    return !contextReferences.some(ref => responseLower.includes(ref));
+  }
+  
+  /**
+   * Get Parlant metrics and statistics
+   */
+  getParlantMetrics() {
+    const engineMetrics = this.parlantEngine.getParlantMetrics();
+    
+    const applicationStats = {
+      totalApplications: this.applicationHistory.size,
+      averageExecutionTime: Array.from(this.applicationHistory.values()).reduce(
+        (sum, result) => sum + result.executionTime,
+        0
+      ) / this.applicationHistory.size || 0,
+      averageQualityImprovement: Array.from(this.applicationHistory.values()).reduce(
+        (sum, result) => sum + result.qualityImprovement,
+        0
+      ) / this.applicationHistory.size || 0,
+    };
+    
+    return {
+      enabled: this.isEnabled,
+      validationEnabled: this.validationEnabled,
+      engine: engineMetrics,
+      applications: applicationStats,
+    };
+  }
+  
+  /**
+   * Get all Parlant guidelines
+   */
+  getGuidelines(): ParlantGuideline[] {
+    return this.parlantEngine.getGuidelines();
+  }
+  
+  /**
+   * Add custom guideline
+   */
+  addGuideline(guideline: ParlantGuideline): void {
+    this.parlantEngine.addGuideline(guideline);
+  }
+  
+  /**
+   * Get active customer journeys
+   */
+  getActiveJourneys() {
+    return this.parlantEngine.getActiveJourneys();
+  }
+  
+  /**
+   * Create customer journey
+   */
+  async createJourney(id: string, name: string, states: string[], guidelines: string[]) {
+    return this.parlantEngine.createJourney(id, name, states, guidelines);
+  }
+  
+  /**
+   * Transition journey to next state
+   */
+  async transitionJourney(journeyId: string, nextState: string, context: Record<string, any> = {}) {
+    return this.parlantEngine.transitionJourney(journeyId, nextState, context);
+  }
+  
+  /**
+   * Enable/disable Parlant standards enforcement
+   */
+  setEnabled(enabled: boolean): void {
+    this.isEnabled = enabled;
+    console.log(`${enabled ? '✅' : '⚠️'} Parlant standards enforcement ${enabled ? 'enabled' : 'disabled'}`);
+  }
+  
+  /**
+   * Enable/disable validation
+   */
+  setValidationEnabled(enabled: boolean): void {
+    this.validationEnabled = enabled;
+    console.log(`${enabled ? '✅' : '⚠️'} Parlant response validation ${enabled ? 'enabled' : 'disabled'}`);
+  }
+  
+  /**
+   * Get canned responses
+   */
+  getCannedResponses() {
+    return this.parlantEngine.getCannedResponses();
+  }
+  
+  /**
+   * Get system variables
+   */
+  getVariables() {
+    return this.parlantEngine.getVariables();
+  }
+}
+
+// Singleton export
+export const parlantWiringService = new ParlantWiringService();

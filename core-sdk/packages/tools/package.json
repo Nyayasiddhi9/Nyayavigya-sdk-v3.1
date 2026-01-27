@@ -1,0 +1,35 @@
+{
+  "name": "@wai/tools",
+  "version": "1.0.0",
+  "description": "WAI SDK Tools - Tool registry and 80+ tool ecosystem (foundation)",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": ["dist", "src"],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch"
+  },
+  "dependencies": {
+    "@wai/core": "workspace:*",
+    "@wai/protocols": "workspace:*",
+    "axios": "^1.7.9",
+    "date-fns": "^4.1.0",
+    "jsonpath-plus": "^10.2.0",
+    "vm2": "^3.9.19",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.1",
+    "typescript": "^5.7.2"
+  },
+  "license": "MIT"
+}

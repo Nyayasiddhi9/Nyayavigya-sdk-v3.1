@@ -1,0 +1,40 @@
+{
+  "name": "@wai/core",
+  "version": "1.0.0",
+  "description": "WAI SDK Core - Pure orchestration with zero external dependencies",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.1",
+    "typescript": "^5.7.2"
+  },
+  "keywords": [
+    "wai",
+    "orchestration",
+    "ai",
+    "llm",
+    "agents"
+  ],
+  "license": "MIT"
+}

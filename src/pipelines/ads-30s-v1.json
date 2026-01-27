@@ -1,0 +1,105 @@
+{
+  "version": "1.0.0",
+  "id": "ads-30s-v1",
+  "name": "Advertisement 30-Second Video Creator",
+  "description": "Creates compelling 30-second video advertisements",
+  "type": "production",
+  "romaCompliant": true,
+  "agents": [
+    "video-producer-1",
+    "copywriter-1",
+    "brand-designer-1"
+  ],
+  "workflow": {
+    "steps": [
+      {
+        "id": "ads-30s-v1-brief-analysis",
+        "name": "Brief Analysis",
+        "order": 1,
+        "agent": "video-producer-1",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      },
+      {
+        "id": "ads-30s-v1-script-creation",
+        "name": "Script Creation",
+        "order": 2,
+        "agent": "copywriter-1",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      },
+      {
+        "id": "ads-30s-v1-video-production",
+        "name": "Video Production",
+        "order": 3,
+        "agent": "brand-designer-1",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      },
+      {
+        "id": "ads-30s-v1-brand-integration",
+        "name": "Brand Integration",
+        "order": 4,
+        "agent": "video-producer-1",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      },
+      {
+        "id": "ads-30s-v1-optimization",
+        "name": "Optimization",
+        "order": 5,
+        "agent": "copywriter-1",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      }
+    ],
+    "routing": {
+      "sequential": true,
+      "parallelCapable": false,
+      "fallbackStrategy": "graceful-degradation"
+    }
+  },
+  "evaluation": {
+    "metrics": [
+      "quality_score",
+      "execution_time",
+      "resource_usage",
+      "user_satisfaction"
+    ],
+    "thresholds": {
+      "quality_score": 0.8,
+      "execution_time": 600000,
+      "resource_usage": "medium",
+      "user_satisfaction": 0.85
+    },
+    "goldens": [
+      "ads-30s-v1-golden-test-1",
+      "ads-30s-v1-golden-test-2"
+    ]
+  },
+  "deployment": {
+    "status": "active",
+    "regions": [
+      "us-east-1",
+      "eu-west-1",
+      "ap-southeast-1"
+    ],
+    "scaling": "auto",
+    "monitoring": true
+  }
+}

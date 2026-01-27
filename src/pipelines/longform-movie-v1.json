@@ -1,0 +1,105 @@
+{
+  "version": "1.0.0",
+  "id": "longform-movie-v1",
+  "name": "Long-Form Movie Production",
+  "description": "Complete movie production from script to final cut",
+  "type": "production",
+  "romaCompliant": true,
+  "agents": [
+    "video-producer-2",
+    "ai-specialist-1",
+    "content-creator-2"
+  ],
+  "workflow": {
+    "steps": [
+      {
+        "id": "longform-movie-v1-script-analysis",
+        "name": "Script Analysis",
+        "order": 1,
+        "agent": "video-producer-2",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      },
+      {
+        "id": "longform-movie-v1-scene-planning",
+        "name": "Scene Planning",
+        "order": 2,
+        "agent": "ai-specialist-1",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      },
+      {
+        "id": "longform-movie-v1-asset-generation",
+        "name": "Asset Generation",
+        "order": 3,
+        "agent": "content-creator-2",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      },
+      {
+        "id": "longform-movie-v1-editing",
+        "name": "Editing",
+        "order": 4,
+        "agent": "video-producer-2",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      },
+      {
+        "id": "longform-movie-v1-post-production",
+        "name": "Post Production",
+        "order": 5,
+        "agent": "ai-specialist-1",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      }
+    ],
+    "routing": {
+      "sequential": true,
+      "parallelCapable": false,
+      "fallbackStrategy": "graceful-degradation"
+    }
+  },
+  "evaluation": {
+    "metrics": [
+      "quality_score",
+      "execution_time",
+      "resource_usage",
+      "user_satisfaction"
+    ],
+    "thresholds": {
+      "quality_score": 0.8,
+      "execution_time": 600000,
+      "resource_usage": "medium",
+      "user_satisfaction": 0.85
+    },
+    "goldens": [
+      "longform-movie-v1-golden-test-1",
+      "longform-movie-v1-golden-test-2"
+    ]
+  },
+  "deployment": {
+    "status": "active",
+    "regions": [
+      "us-east-1",
+      "eu-west-1",
+      "ap-southeast-1"
+    ],
+    "scaling": "auto",
+    "monitoring": true
+  }
+}

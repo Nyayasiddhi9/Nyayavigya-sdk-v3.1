@@ -1,0 +1,105 @@
+{
+  "version": "1.0.0",
+  "id": "reels-v1",
+  "name": "Social Media Reels Generator",
+  "description": "Generates viral-optimized social media reels",
+  "type": "production",
+  "romaCompliant": true,
+  "agents": [
+    "content-creator-1",
+    "social-media-1",
+    "video-producer-1"
+  ],
+  "workflow": {
+    "steps": [
+      {
+        "id": "reels-v1-trend-analysis",
+        "name": "Trend Analysis",
+        "order": 1,
+        "agent": "content-creator-1",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      },
+      {
+        "id": "reels-v1-content-planning",
+        "name": "Content Planning",
+        "order": 2,
+        "agent": "social-media-1",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      },
+      {
+        "id": "reels-v1-video-creation",
+        "name": "Video Creation",
+        "order": 3,
+        "agent": "video-producer-1",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      },
+      {
+        "id": "reels-v1-optimization",
+        "name": "Optimization",
+        "order": 4,
+        "agent": "content-creator-1",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      },
+      {
+        "id": "reels-v1-distribution",
+        "name": "Distribution",
+        "order": 5,
+        "agent": "social-media-1",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      }
+    ],
+    "routing": {
+      "sequential": true,
+      "parallelCapable": false,
+      "fallbackStrategy": "graceful-degradation"
+    }
+  },
+  "evaluation": {
+    "metrics": [
+      "quality_score",
+      "execution_time",
+      "resource_usage",
+      "user_satisfaction"
+    ],
+    "thresholds": {
+      "quality_score": 0.8,
+      "execution_time": 600000,
+      "resource_usage": "medium",
+      "user_satisfaction": 0.85
+    },
+    "goldens": [
+      "reels-v1-golden-test-1",
+      "reels-v1-golden-test-2"
+    ]
+  },
+  "deployment": {
+    "status": "active",
+    "regions": [
+      "us-east-1",
+      "eu-west-1",
+      "ap-southeast-1"
+    ],
+    "scaling": "auto",
+    "monitoring": true
+  }
+}

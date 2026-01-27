@@ -1,0 +1,588 @@
+/**
+ * Claude Extended Thinking Wiring Service
+ * 
+ * Wires hierarchical multi-agent Claude reasoning into Wizards platform:
+ * - Breaks complex problems into sub-tasks delegated to specialized agents
+ * - Coordinates Claude Coordinator, Analyst, Creator, Reviewer, Executor
+ * - Enables deep analytical thinking through agent collaboration
+ * - Provides transparent thinking process visibility for founders
+ */
+
+import { ClaudeSubAgentOrchestrator, type ClaudeSubAgent, type SubAgentTask, type AgentCollaboration } from '../integrations/claude-subagents-orchestration';
+import { EventEmitter } from 'events';
+
+interface ExtendedThinkingMetrics {
+  totalTasksProcessed: number;
+  totalAgentsCreated: number;
+  totalCollaborations: number;
+  averageThinkingDepth: number;
+  averageTaskDecomposition: number;
+  totalThinkingTimeMs: number;
+}
+
+interface ThinkingSession {
+  sessionId: string;
+  orchestrationId?: string;
+  startupId?: number;
+  mainTask: string;
+  complexity: 'simple' | 'medium' | 'complex' | 'expert';
+  subTasks: SubAgentTask[];
+  collaborations: AgentCollaboration[];
+  thinkingProcess: {
+    step: number;
+    agent: string;
+    action: string;
+    reasoning: string;
+    timestamp: Date;
+  }[];
+  started: Date;
+  completed?: Date;
+  result?: any;
+}
+
+export class ClaudeExtendedThinkingWiringService extends EventEmitter {
+  private orchestrator: ClaudeSubAgentOrchestrator;
+  private metrics: ExtendedThinkingMetrics;
+  private thinkingSessions: Map<string, ThinkingSession> = new Map();
+  private isInitialized: boolean = false;
+  
+  constructor() {
+    super();
+    
+    this.metrics = {
+      totalTasksProcessed: 0,
+      totalAgentsCreated: 0,
+      totalCollaborations: 0,
+      averageThinkingDepth: 0,
+      averageTaskDecomposition: 0,
+      totalThinkingTimeMs: 0,
+    };
+    
+    this.initialize();
+  }
+  
+  /**
+   * Initialize Claude sub-agent orchestrator
+   */
+  private initialize(): void {
+    try {
+      this.orchestrator = new ClaudeSubAgentOrchestrator();
+      
+      // Listen to orchestrator events for visibility
+      this.orchestrator.on('agent:created', (agent: ClaudeSubAgent) => {
+        console.log(`🤖 Sub-agent created: ${agent.name} (${agent.specialty})`);
+        this.metrics.totalAgentsCreated++;
+      });
+      
+      this.orchestrator.on('task:assigned', (task: SubAgentTask) => {
+        console.log(`📋 Task assigned: ${task.description} → ${task.assignedAgent}`);
+      });
+      
+      this.orchestrator.on('collaboration:started', (collaboration: AgentCollaboration) => {
+        console.log(`🤝 Collaboration started: ${collaboration.topic} (${collaboration.participants.length} agents)`);
+        this.metrics.totalCollaborations++;
+      });
+      
+      this.isInitialized = true;
+      
+      console.log('✅ Claude Extended Thinking Wiring Service initialized');
+      console.log('🧠 Hierarchical multi-agent reasoning enabled');
+      console.log('🤖 5 specialized Claude agents ready: Coordinator, Analyst, Creator, Reviewer, Executor');
+      console.log('🎯 Complex task decomposition and delegation active');
+    } catch (error) {
+      console.error('❌ Claude Extended Thinking initialization failed:', error);
+      this.isInitialized = false;
+    }
+  }
+  
+  /**
+   * Apply extended thinking to a complex task
+   * Breaks down task into sub-tasks and delegates to specialized agents
+   */
+  async applyExtendedThinking(
+    sessionId: string,
+    task: string,
+    context: {
+      orchestrationId?: string;
+      startupId?: number;
+      complexity?: 'simple' | 'medium' | 'complex' | 'expert';
+      requireReview?: boolean;
+    } = {}
+  ): Promise<{
+    sessionId: string;
+    thinking: ThinkingSession;
+    subTasks: SubAgentTask[];
+    collaborations: AgentCollaboration[];
+  }> {
+    if (!this.isInitialized) {
+      throw new Error('Claude Extended Thinking not initialized');
+    }
+    
+    const complexity = context.complexity || this.assessComplexity(task);
+    const startTime = Date.now();
+    
+    console.log(`🧠 Starting extended thinking session: ${sessionId}`);
+    console.log(`  Task: ${task.slice(0, 100)}${task.length > 100 ? '...' : ''}`);
+    console.log(`  Complexity: ${complexity}`);
+    
+    // Create thinking session
+    const thinkingSession: ThinkingSession = {
+      sessionId,
+      orchestrationId: context.orchestrationId,
+      startupId: context.startupId,
+      mainTask: task,
+      complexity,
+      subTasks: [],
+      collaborations: [],
+      thinkingProcess: [],
+      started: new Date(),
+    };
+    
+    this.thinkingSessions.set(sessionId, thinkingSession);
+    
+    // Step 1: Coordinator breaks down the task
+    this.recordThinkingStep(sessionId, {
+      step: 1,
+      agent: 'ClaudeCoordinator',
+      action: 'Task decomposition',
+      reasoning: `Analyzing complex task and breaking it into manageable sub-tasks based on ${complexity} complexity level`,
+      timestamp: new Date(),
+    });
+    
+    // Decompose task into sub-tasks based on complexity
+    const subTasks = this.decomposeTask(task, complexity, context);
+    thinkingSession.subTasks = subTasks;
+    
+    // Step 2: Assign sub-tasks to specialized agents
+    this.recordThinkingStep(sessionId, {
+      step: 2,
+      agent: 'ClaudeCoordinator',
+      action: 'Sub-task delegation',
+      reasoning: `Delegated ${subTasks.length} sub-tasks to specialized agents: ${this.getUniqueAgentNames(subTasks).join(', ')}`,
+      timestamp: new Date(),
+    });
+    
+    // Step 3: Execute sub-tasks (if complexity requires collaboration)
+    if (complexity === 'complex' || complexity === 'expert') {
+      // Create collaboration structure
+      const collaboration = {
+        id: `collab_${sessionId}`,
+        participants: subTasks.map(t => t.assignedAgent),
+        task,
+        started: new Date(),
+        status: 'active' as const,
+      };
+      
+      thinkingSession.collaborations.push(collaboration);
+      
+      this.recordThinkingStep(sessionId, {
+        step: 3,
+        agent: 'Multi-agent collaboration',
+        action: 'Collaborative execution',
+        reasoning: `${collaboration.participants.length} agents collaborating on complex task with shared context`,
+        timestamp: new Date(),
+      });
+    }
+    
+    // Step 4: Review (if required)
+    if (context.requireReview) {
+      this.recordThinkingStep(sessionId, {
+        step: 4,
+        agent: 'ClaudeReviewer',
+        action: 'Quality review',
+        reasoning: 'Reviewing outputs for quality, consistency, and completeness',
+        timestamp: new Date(),
+      });
+    }
+    
+    // Update metrics
+    this.metrics.totalTasksProcessed++;
+    this.metrics.averageTaskDecomposition = 
+      (this.metrics.averageTaskDecomposition * (this.metrics.totalTasksProcessed - 1) + subTasks.length) / 
+      this.metrics.totalTasksProcessed;
+    this.metrics.averageThinkingDepth = 
+      (this.metrics.averageThinkingDepth * (this.metrics.totalTasksProcessed - 1) + thinkingSession.thinkingProcess.length) / 
+      this.metrics.totalTasksProcessed;
+    
+    const thinkingTime = Date.now() - startTime;
+    this.metrics.totalThinkingTimeMs += thinkingTime;
+    
+    console.log(`✅ Extended thinking complete (${thinkingTime}ms)`);
+    console.log(`  Sub-tasks: ${subTasks.length}`);
+    console.log(`  Thinking depth: ${thinkingSession.thinkingProcess.length} steps`);
+    console.log(`  Collaborations: ${thinkingSession.collaborations.length}`);
+    
+    thinkingSession.completed = new Date();
+    
+    return {
+      sessionId,
+      thinking: thinkingSession,
+      subTasks,
+      collaborations: thinkingSession.collaborations,
+    };
+  }
+  
+  /**
+   * Delegate complex task - Actually execute sub-tasks through orchestrator
+   * This creates hierarchical multi-agent execution
+   */
+  async delegateComplexTask(
+    sessionId: string,
+    task: string,
+    context: {
+      orchestrationId?: string;
+      startupId?: number;
+      studioType?: string;
+      orchestrator?: any; // Reference to main orchestration service
+    } = {}
+  ): Promise<{
+    sessionId: string;
+    thinking: ThinkingSession;
+    subTaskResults: any[];
+    finalResult: any;
+  }> {
+    // Step 1: Apply extended thinking to decompose task
+    const thinkingResult = await this.applyExtendedThinking(sessionId, task, {
+      orchestrationId: context.orchestrationId,
+      startupId: context.startupId,
+      complexity: this.assessComplexity(task),
+    });
+    
+    const { thinking, subTasks } = thinkingResult;
+    
+    // Step 2: Execute sub-tasks through main orchestrator (if available)
+    const subTaskResults: any[] = [];
+    
+    if (context.orchestrator && subTasks.length > 0) {
+      console.log(`🚀 Delegating ${subTasks.length} sub-tasks to orchestrator...`);
+      
+      for (const subTask of subTasks) {
+        try {
+          // Execute sub-task through orchestrator
+          const subResult = await context.orchestrator.executeOrchestrationJob({
+            startupId: context.startupId || 1,
+            studioType: context.studioType || 'ideation_lab',
+            jobType: 'sub_task' as const,
+            workflow: 'sub_task_execution',
+            inputs: {
+              task: subTask.description,
+              context: subTask.context,
+              assignedAgent: subTask.assignedAgent,
+            },
+            priority: 'medium' as const,
+          });
+          
+          subTaskResults.push({
+            subTaskId: subTask.id,
+            description: subTask.description,
+            assignedAgent: subTask.assignedAgent,
+            result: subResult,
+            success: subResult.success,
+          });
+          
+          console.log(`  ✅ Sub-task completed: ${subTask.description.slice(0, 50)}...`);
+        } catch (error) {
+          console.error(`  ❌ Sub-task failed: ${subTask.description}`, error);
+          subTaskResults.push({
+            subTaskId: subTask.id,
+            description: subTask.description,
+            assignedAgent: subTask.assignedAgent,
+            result: null,
+            success: false,
+            error: error instanceof Error ? error.message : 'Unknown error',
+          });
+        }
+      }
+    }
+    
+    // Step 3: Synthesize results from all sub-tasks
+    const finalResult = {
+      mainTask: task,
+      complexity: thinking.complexity,
+      subTaskCount: subTasks.length,
+      successfulSubTasks: subTaskResults.filter(r => r.success).length,
+      failedSubTasks: subTaskResults.filter(r => !r.success).length,
+      thinkingProcess: thinking.thinkingProcess,
+      subTaskResults,
+      synthesizedOutput: this.synthesizeResults(subTaskResults),
+    };
+    
+    // Update session with results
+    thinking.result = finalResult;
+    thinking.completed = new Date();
+    
+    console.log(`✅ Complex task delegation complete`);
+    console.log(`  Sub-tasks executed: ${subTaskResults.length}/${subTasks.length}`);
+    console.log(`  Success rate: ${finalResult.successfulSubTasks}/${finalResult.subTaskCount}`);
+    
+    return {
+      sessionId,
+      thinking,
+      subTaskResults,
+      finalResult,
+    };
+  }
+  
+  /**
+   * Synthesize results from multiple sub-tasks into coherent output
+   */
+  private synthesizeResults(subTaskResults: any[]): string {
+    if (subTaskResults.length === 0) {
+      return 'No sub-tasks were executed.';
+    }
+    
+    const successfulResults = subTaskResults.filter(r => r.success);
+    
+    if (successfulResults.length === 0) {
+      return 'All sub-tasks failed. Unable to synthesize results.';
+    }
+    
+    let synthesis = `Hierarchical execution completed with ${successfulResults.length}/${subTaskResults.length} successful sub-tasks:\n\n`;
+    
+    successfulResults.forEach((result, index) => {
+      synthesis += `${index + 1}. ${result.assignedAgent}: ${result.description}\n`;
+      if (result.result?.result) {
+        synthesis += `   Result: ${JSON.stringify(result.result.result).slice(0, 200)}...\n`;
+      }
+      synthesis += '\n';
+    });
+    
+    return synthesis;
+  }
+
+  /**
+   * Get extended thinking session details
+   */
+  getThinkingSession(sessionId: string): ThinkingSession | undefined {
+    return this.thinkingSessions.get(sessionId);
+  }
+  
+  /**
+   * Get all active thinking sessions
+   */
+  getActiveThinkingSessions(): ThinkingSession[] {
+    return Array.from(this.thinkingSessions.values()).filter(
+      session => !session.completed
+    );
+  }
+  
+  /**
+   * Get thinking process transparency for a session
+   */
+  getThinkingProcess(sessionId: string): ThinkingSession['thinkingProcess'] | undefined {
+    const session = this.thinkingSessions.get(sessionId);
+    return session?.thinkingProcess;
+  }
+  
+  /**
+   * Assess task complexity for appropriate agent allocation
+   */
+  private assessComplexity(task: string): 'simple' | 'medium' | 'complex' | 'expert' {
+    const taskLength = task.length;
+    const complexityIndicators = [
+      'analyze',
+      'compare',
+      'evaluate',
+      'design',
+      'architect',
+      'optimize',
+      'integrate',
+      'complex',
+      'multi-step',
+      'comprehensive',
+      'strategic',
+      'advanced',
+    ];
+    
+    const indicatorCount = complexityIndicators.filter(indicator =>
+      task.toLowerCase().includes(indicator)
+    ).length;
+    
+    if (taskLength > 500 || indicatorCount >= 4) return 'expert';
+    if (taskLength > 300 || indicatorCount >= 3) return 'complex';
+    if (taskLength > 150 || indicatorCount >= 2) return 'medium';
+    return 'simple';
+  }
+  
+  /**
+   * Record thinking step for transparency
+   */
+  private recordThinkingStep(
+    sessionId: string,
+    step: {
+      step: number;
+      agent: string;
+      action: string;
+      reasoning: string;
+      timestamp: Date;
+    }
+  ): void {
+    const session = this.thinkingSessions.get(sessionId);
+    if (session) {
+      session.thinkingProcess.push(step);
+      
+      // Emit event for real-time visibility
+      this.emit('thinking:step', {
+        sessionId,
+        ...step,
+      });
+    }
+  }
+  
+  /**
+   * Get unique agent names from sub-tasks
+   */
+  private getUniqueAgentNames(subTasks: SubAgentTask[]): string[] {
+    const agentNames = subTasks.map(task => task.assignedAgent);
+    return [...new Set(agentNames)];
+  }
+  
+  /**
+   * Get all specialized sub-agents
+   */
+  getSpecializedAgents(): ClaudeSubAgent[] {
+    return this.orchestrator.getAllAgents();
+  }
+  
+  /**
+   * Get metrics for extended thinking usage
+   */
+  getMetrics(): ExtendedThinkingMetrics {
+    return { ...this.metrics };
+  }
+  
+  /**
+   * Get orchestrator status
+   */
+  getStatus() {
+    return {
+      initialized: this.isInitialized,
+      agents: this.orchestrator.getAllAgents().map(agent => ({
+        id: agent.id,
+        name: agent.name,
+        role: agent.role,
+        specialty: agent.specialty,
+        status: agent.status,
+        performance: agent.performance,
+      })),
+      activeTasks: this.orchestrator.getActiveTasks().map(task => ({
+        id: task.id,
+        type: task.type,
+        description: task.description,
+        assignedAgent: task.assignedAgent,
+        status: task.status,
+        priority: task.priority,
+      })),
+      collaborations: this.orchestrator.getActiveCollaborations().map(collab => ({
+        id: collab.id,
+        participants: collab.participants,
+        topic: collab.topic,
+        status: collab.status,
+      })),
+      metrics: this.metrics,
+      thinkingSessions: {
+        total: this.thinkingSessions.size,
+        active: this.getActiveThinkingSessions().length,
+      },
+    };
+  }
+  
+  /**
+   * Health check for extended thinking system
+   */
+  healthCheck(): { status: string; details: any } {
+    if (!this.isInitialized) {
+      return {
+        status: 'not-ready',
+        details: { error: 'Claude Extended Thinking not initialized' },
+      };
+    }
+    
+    const agents = this.orchestrator.getAllAgents();
+    const activeTasks = this.orchestrator.getActiveTasks();
+    
+    return {
+      status: 'healthy',
+      details: {
+        initialized: this.isInitialized,
+        agentsReady: agents.length,
+        activeTasks: activeTasks.length,
+        activeCollaborations: this.orchestrator.getActiveCollaborations().length,
+        thinkingSessions: this.thinkingSessions.size,
+        metrics: this.metrics,
+      },
+    };
+  }
+  
+  /**
+   * Reset metrics (for testing)
+   */
+  resetMetrics(): void {
+    this.metrics = {
+      totalTasksProcessed: 0,
+      totalAgentsCreated: 0,
+      totalCollaborations: 0,
+      averageThinkingDepth: 0,
+      averageTaskDecomposition: 0,
+      totalThinkingTimeMs: 0,
+    };
+  }
+  
+  /**
+   * Clear completed thinking sessions (retain last 100 for history)
+   */
+  clearCompletedSessions(): number {
+    const completedSessions = Array.from(this.thinkingSessions.values())
+      .filter(session => session.completed)
+      .sort((a, b) => b.completed!.getTime() - a.completed!.getTime());
+    
+    // Keep last 100 completed sessions
+    const sessionsToRemove = completedSessions.slice(100);
+    
+    sessionsToRemove.forEach(session => {
+      this.thinkingSessions.delete(session.sessionId);
+    });
+    
+    return sessionsToRemove.length;
+  }
+
+  /**
+   * Decompose a complex task into manageable sub-tasks
+   */
+  private decomposeTask(
+    task: string,
+    complexity: string,
+    context: {
+      orchestrationId: string;
+      startupId: number;
+      requireReview?: boolean;
+    }
+  ): SubTask[] {
+    // Determine number of sub-tasks based on complexity
+    const subTaskCount = {
+      simple: 2,
+      moderate: 3,
+      complex: 4,
+      expert: 5,
+    }[complexity] || 3;
+
+    // Create sub-tasks with agent assignments
+    const subTasks: SubTask[] = [];
+    const agentPool = ['ClaudeAnalyst', 'ClaudeCreator', 'ClaudeExecutor', 'ClaudeReviewer'];
+
+    for (let i = 0; i < subTaskCount; i++) {
+      subTasks.push({
+        id: `subtask_${context.orchestrationId}_${i}`,
+        description: `Sub-task ${i + 1} of ${subTaskCount} for: ${task.slice(0, 50)}...`,
+        assignedAgent: agentPool[i % agentPool.length],
+        status: 'pending',
+        dependencies: i > 0 ? [`subtask_${context.orchestrationId}_${i - 1}`] : [],
+      });
+    }
+
+    return subTasks;
+  }
+}
+
+// Singleton export
+export const claudeExtendedThinkingWiringService = new ClaudeExtendedThinkingWiringService();

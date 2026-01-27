@@ -1,0 +1,105 @@
+{
+  "version": "1.0.0",
+  "id": "dev-coding-v1",
+  "name": "Development Coding Assistant",
+  "description": "End-to-end software development pipeline",
+  "type": "production",
+  "romaCompliant": true,
+  "agents": [
+    "fullstack-developer-1",
+    "senior-qa-engineer-1",
+    "devops-engineer-1"
+  ],
+  "workflow": {
+    "steps": [
+      {
+        "id": "dev-coding-v1-requirements-analysis",
+        "name": "Requirements Analysis",
+        "order": 1,
+        "agent": "fullstack-developer-1",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      },
+      {
+        "id": "dev-coding-v1-architecture-design",
+        "name": "Architecture Design",
+        "order": 2,
+        "agent": "senior-qa-engineer-1",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      },
+      {
+        "id": "dev-coding-v1-implementation",
+        "name": "Implementation",
+        "order": 3,
+        "agent": "devops-engineer-1",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      },
+      {
+        "id": "dev-coding-v1-testing",
+        "name": "Testing",
+        "order": 4,
+        "agent": "fullstack-developer-1",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      },
+      {
+        "id": "dev-coding-v1-deployment",
+        "name": "Deployment",
+        "order": 5,
+        "agent": "senior-qa-engineer-1",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      }
+    ],
+    "routing": {
+      "sequential": true,
+      "parallelCapable": false,
+      "fallbackStrategy": "graceful-degradation"
+    }
+  },
+  "evaluation": {
+    "metrics": [
+      "quality_score",
+      "execution_time",
+      "resource_usage",
+      "user_satisfaction"
+    ],
+    "thresholds": {
+      "quality_score": 0.8,
+      "execution_time": 600000,
+      "resource_usage": "medium",
+      "user_satisfaction": 0.85
+    },
+    "goldens": [
+      "dev-coding-v1-golden-test-1",
+      "dev-coding-v1-golden-test-2"
+    ]
+  },
+  "deployment": {
+    "status": "active",
+    "regions": [
+      "us-east-1",
+      "eu-west-1",
+      "ap-southeast-1"
+    ],
+    "scaling": "auto",
+    "monitoring": true
+  }
+}

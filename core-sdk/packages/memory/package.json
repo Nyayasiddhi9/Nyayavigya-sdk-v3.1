@@ -1,0 +1,37 @@
+{
+  "name": "@wai/memory",
+  "version": "1.0.0",
+  "description": "WAI SDK Memory - mem0, CAM monitoring, vector storage",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": ["dist", "src"],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "benchmark": "tsx src/benchmarks/memory-benchmark.ts",
+    "benchmark:verbose": "tsx src/benchmarks/memory-benchmark.ts 1000 true --verbose"
+  },
+  "dependencies": {
+    "@wai/core": "workspace:*",
+    "@wai/protocols": "workspace:*",
+    "openai": "^4.78.0",
+    "pgvector": "^0.2.0",
+    "pg": "^8.13.1",
+    "uuid": "^10.0.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.1",
+    "typescript": "^5.7.2"
+  },
+  "license": "MIT"
+}

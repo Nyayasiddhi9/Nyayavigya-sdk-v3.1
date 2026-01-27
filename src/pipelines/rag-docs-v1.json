@@ -1,0 +1,105 @@
+{
+  "version": "1.0.0",
+  "id": "rag-docs-v1",
+  "name": "RAG Document Processing",
+  "description": "Advanced RAG with document intelligence",
+  "type": "production",
+  "romaCompliant": true,
+  "agents": [
+    "ai-ml-developer-1",
+    "data-specialist-1",
+    "api-developer-1"
+  ],
+  "workflow": {
+    "steps": [
+      {
+        "id": "rag-docs-v1-document-ingestion",
+        "name": "Document Ingestion",
+        "order": 1,
+        "agent": "ai-ml-developer-1",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      },
+      {
+        "id": "rag-docs-v1-vector-processing",
+        "name": "Vector Processing",
+        "order": 2,
+        "agent": "data-specialist-1",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      },
+      {
+        "id": "rag-docs-v1-knowledge-graph",
+        "name": "Knowledge Graph",
+        "order": 3,
+        "agent": "api-developer-1",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      },
+      {
+        "id": "rag-docs-v1-retrieval-optimization",
+        "name": "Retrieval Optimization",
+        "order": 4,
+        "agent": "ai-ml-developer-1",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      },
+      {
+        "id": "rag-docs-v1-api-generation",
+        "name": "Api Generation",
+        "order": 5,
+        "agent": "data-specialist-1",
+        "timeout": 300000,
+        "retryPolicy": {
+          "maxRetries": 2,
+          "backoffMs": 5000
+        }
+      }
+    ],
+    "routing": {
+      "sequential": true,
+      "parallelCapable": false,
+      "fallbackStrategy": "graceful-degradation"
+    }
+  },
+  "evaluation": {
+    "metrics": [
+      "quality_score",
+      "execution_time",
+      "resource_usage",
+      "user_satisfaction"
+    ],
+    "thresholds": {
+      "quality_score": 0.8,
+      "execution_time": 600000,
+      "resource_usage": "medium",
+      "user_satisfaction": 0.85
+    },
+    "goldens": [
+      "rag-docs-v1-golden-test-1",
+      "rag-docs-v1-golden-test-2"
+    ]
+  },
+  "deployment": {
+    "status": "active",
+    "regions": [
+      "us-east-1",
+      "eu-west-1",
+      "ap-southeast-1"
+    ],
+    "scaling": "auto",
+    "monitoring": true
+  }
+}
