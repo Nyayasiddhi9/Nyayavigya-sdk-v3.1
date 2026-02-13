@@ -1,8 +1,8 @@
-# NyayaVighya Legal SDK v3.1
+# Nyayavigya Legal SDK v3.1
 
 ## Specialized Legal AI Platform for Indian Law
 
-NyayaVighya SDK v3.1 is a comprehensive legal AI platform featuring 275 specialized legal agents across 29 categories, extensive coverage of 50+ Indian statutes, and enterprise-grade legal research capabilities with 22 Indian language support.
+Nyayavigya SDK v3.1 is a comprehensive legal AI platform featuring 275 specialized legal agents across 29 categories, extensive coverage of 50+ Indian statutes, and enterprise-grade legal research capabilities with 22 Indian language support.
 
 ## Legal Domain Coverage
 
@@ -126,7 +126,7 @@ http://localhost:5000/api/v3/legal
 nyayavighya-sdk-v3.1/
 ├── src/
 │   ├── services/           # Enterprise services
-│   ├── agents/             # Core NyayaVighya agents
+│   ├── agents/             # Core Nyayavigya agents
 │   ├── legal-agents/       # 275+ specialized legal agents
 │   ├── middleware/         # Auth, rate limiting, validation
 │   ├── routes/             # API endpoints
@@ -156,8 +156,8 @@ MIT License - See LICENSE file for details.
 
 ## Disclaimer
 
-NyayaVighya SDK is an AI-powered legal research tool. It does not provide legal advice and should not be considered a substitute for professional legal counsel. Always consult with a qualified lawyer for legal matters.
+Nyayavigya SDK is an AI-powered legal research tool. It does not provide legal advice and should not be considered a substitute for professional legal counsel. Always consult with a qualified lawyer for legal matters.
 
 ## Support
 
-For enterprise legal support and custom deployments, contact the NyayaVighya team.
+For enterprise legal support and custom deployments, contact the Nyayavigya team.
